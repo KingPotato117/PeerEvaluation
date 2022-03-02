@@ -1,8 +1,16 @@
 <html>
     <body>
         <h2>Enter the Class Code to Join A Classroom</h2>
-        <form name="joinClassF" method="POST">
-            <input type="number" min="0" max="10000"/>
+        <form name="joinClass" method="POST">
+            <label for="userType">I am a:</label>
+            <input type="radio" name="userType" id="teacher" value="Teacher" required/>
+            <label for="teacher">Teacher</label>
+            <input type="radio" name="userType" id="student" value="Student" required/>
+            <label for="student">Student</label>
+            <br/>
+            <label for="accessCode">Access Code:</label>
+            <input type="number" min="1" max="10000" name="accessCode"required/>
+            
             <input type="submit" />
         </form>
     </body>
