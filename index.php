@@ -35,8 +35,9 @@
             echo "</form>";
         }else if (isset($_GET['teacher'])) {
             include("joinClassTeacher.html");
-        } else if ($_GET['teacherView']) {
-            fetchTeacherData($db);
+        } else if (isset($_GET['teacherView'])) {
+            fetchAverageData($db);
+            fetchAllGradeData($db);
             include("teacherView.html");
         } else {                            //display main page 
             include("home.html");
@@ -78,7 +79,6 @@
             $result = checkPassword($db, $_SESSION['accessCode']);
             $pass = $result['classPassword'];
             if ($givenPass == $pass) {
-                $_SESSION['teacherLoggedIn'] = true;
                 header("Refresh: 0; url=index.php?teacherView");
             } else {
                 echo "<p>Password given does not match password on record, please try again. </p>";
