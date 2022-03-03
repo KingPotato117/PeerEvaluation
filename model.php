@@ -198,4 +198,58 @@
         $_SESSION['studentData'] = $studentData;
     }
 
+    function getStudentData($db) {
+        $studentName = $_SESSION['studentName'];
+        $classId = $_SESSION['classId'];
+
+        $fetchGroups = "SELECT names FROM `groups` WHERE classId = :classId";
+        $statement = $db->prepare($fetchGroups);
+        $statement->bindvalue('classId', $classId);
+        $statement->execute();
+        $res = $statement->fetchall();
+        $names = [];
+        foreach ($res as $name) {
+            array_push($names, $name['names']);
+        }
+        $_SESSION['names'] = $names;
+
+        $fetchGroupIds = "SELECT groupId FROM `groups` WHERE classId = :classId";
+        $statement = $db->prepare($fetchGroupIds);
+        $statement->bindvalue(":classId", $classId);
+        $statement->execute();
+        $res = $statement->fetchall();
+
+        $groupIds = [];
+        foreach ($res as $id) {
+            array_push($groupIds, $id['groupId']);
+        }
+        $_SESSION['groupIds'] = $groupIds;
+    }
+
+    function storeEval($db, $data) {
+        $fetchStudentId = "SELECT studentId FROM `Students` WHERE (studentName = :studentName AND classId = :classId)";
+        $statement = $db->prepare($fetchStudentId);
+        $statement->bindvalue(':studentName', $_SESSION['studentName']);
+        $statement->bindvalue(':classId', $_SESSION['classId']);
+        $statement->execute();
+        $studentId = $statement->fetch();
+        $studentId = intval($studentId['studentId']);
+        foreach ($_SESSION["groupIds"] as $id) {
+            $s1 = $data['1eval'.$id];
+            $s2 = $data['2eval'.$id];
+            $s3 = $data['3eval'.$id];
+            $avg = floatval(($s1+$s2+$s3)/3);
+            $insertEval = "INSERT INTO `Grades` (groupId, Score1, Score2, Score3, AvgScore, Comments, studentId) VALUES (:groupId, :Score1, :Score2, :Score3, :AvgScore, :Comments, :studentId)";
+            $statement = $db->prepare($insertEval);
+            $statement->bindvalue(':groupId', $id);
+            $statement->bindvalue(':Score1', $s1);
+            $statement->bindvalue(':Score2', $s2);
+            $statement->bindvalue(':Score3', $s3);
+            $statement->bindvalue(':AvgScore', $avg);
+            $statement->bindvalue(':Comments', $data['comment'.$id]);
+            $statement->bindvalue(':studentId', $studentId);
+            $statement->execute();
+        }
+    }
+
 ?>

@@ -17,15 +17,13 @@
             include("createClass.html");
         } else if(isset($_GET["joinClass"])) { //display joinClassroom page
             include("joinClass.html");
-        } else if (isset($_GET["read"])) {  //display techer read page 
-            include("read.html");
-        } else if (isset($_GET['student'])) {
+        } else if (isset($_GET['student'])) { //display student login page 
             include("joinClassStudent.html");
             $students = getStudents($db);
             echo "<form method='POST'>";
             echo "<label for='students' >Please select your name: </label>";
-            echo "<select name='students' >";
-
+            echo "<select name='students' required>";
+            //future: put in html
             foreach ($students as $student) {
                 echo "<option value='". $student["studentName"] . "' >". $student["studentName"] .  "</option>";
             }
@@ -33,18 +31,41 @@
             echo "<input type='submit' name='studentLogin' />";
             echo "</select>";
             echo "</form>";
-        }else if (isset($_GET['teacher'])) {
+        } else if (isset($_GET['teacher'])) { //display teacher login page 
             include("joinClassTeacher.html");
-        } else if (isset($_GET['teacherView'])) {
+        } else if (isset($_GET['teacherView'])) { //display teacher user page 
             fetchAverageData($db);
             fetchAllGradeData($db);
             include("teacherView.html");
-        } else {                            //display main page 
+        } else if (isset($_GET['studentView'])) { //display student login user page
+            getStudentData($db);
+            $id = 0;
+            echo "<form method='POST'>";
+            foreach ($_SESSION['names'] as $names) {
+                echo "<h3>Group: $names </h3><br>";
+                echo "<label for='1eval{$_SESSION['groupIds'][$id]}'>Originality and Aesthetics - clearly shows asymmetric equilibrium:\t\t</label>";
+                echo "<input name='1eval{$_SESSION['groupIds'][$id]}' type='number' min=1 max=5 required><br>";
+                echo "<label for='2eval{$_SESSION['groupIds'][$id]}'>Display has all equations of equilibrium calculated and neatly shown:\t\t</label>";
+                echo "<input name='2eval{$_SESSION['groupIds'][$id]}' type='number' min=1 max=5 required><br>";
+                echo "<label for='3eval{$_SESSION['groupIds'][$id]}'>Quality of project design and implementation:\t\t</label>";
+                echo "<input name='3eval{$_SESSION['groupIds'][$id]}' type='number' min=1 max=5 required><br>";
+                echo "<label for='comment{$_SESSION['groupIds'][$id]}'>Comments:\t\t</label>";
+                echo "<input name='comment{$_SESSION['groupIds'][$id]}' type='text'><br>";
+                echo "<input name='eval' type='hidden'>";
+                echo "<br>";
+                $id++;
+            }
+            echo "<input type='submit'>";
+            echo "</form>";
+           
+        } else if (isset($_GET['complete'])) { //display complete page 
+            include("complete.html"); 
+        } else {                            //display main page
             include("home.html");
         }
 
         //handle POST requests 
-        if(isset($_POST['submitFile'])) {
+        if(isset($_POST['submitFile'])) { //handle file upload 
             if ($_FILES['studentGroups']['error'] == UPLOAD_ERR_OK        
                   && is_uploaded_file($_FILES['studentGroups']['tmp_name'])) {
                 $contents = file_get_contents($_FILES['studentGroups']['tmp_name']);
@@ -58,9 +79,9 @@
                     }
                 }
             createClassroom($db, $groups);
-            header("Refresh: 0; url=index.php?read");
+            header("Refresh: 0; url=index.php?teacherView"); 
             }
-        } else if (isset($_POST['userType'])) {
+        } else if (isset($_POST['userType'])) { //hander user type form
             $classId = joinClassRoom($db, $_POST['accessCode']);
             if ($classId != false) {
                 $classId = $classId['classId'];
@@ -74,7 +95,7 @@
             } else {
                 echo "<p>Class with code " . $_POST['accessCode'] . " does not exist! Check code and try again.</p>";
             }
-        } else if (isset($_POST['teacherLogin'])) {
+        } else if (isset($_POST['teacherLogin'])) { //handle teacher login form
             $givenPass = $_POST['password'];
             $result = checkPassword($db, $_SESSION['accessCode']);
             $pass = $result['classPassword'];
@@ -83,6 +104,12 @@
             } else {
                 echo "<p>Password given does not match password on record, please try again. </p>";
             }
+        } else if (isset($_POST['studentLogin'])) { //handle student login form  
+            $_SESSION['studentName'] = $_POST['students'];
+            header("Refresh: 0; url=index.php?studentView");
+        } else if (isset($_POST['eval'])) {  //handle student completing eval 
+            storeEval($db, $_POST);
+            header("Refresh: 0; url=index.php?complete"); //not working
         }
     } catch (PDOException $e) {
 
