@@ -1,4 +1,5 @@
 <?php
+
     require("model.php");
          
     session_set_cookie_params(4000, '/');          
@@ -7,7 +8,7 @@
     $dsn = 'mysql:host=localhost;dbname=PeerEval';
     $dbusername = 'prototype';
     $dbpassword = 'CS495';
-
+    header("Refresh: 0; url=index.php?");
     include("navBar.html");
 
     try {
@@ -27,7 +28,6 @@
             foreach ($students as $student) {
                 echo "<option value='". $student["studentName"] . "' >". $student["studentName"] .  "</option>";
             }
-
             echo "<input type='submit' name='studentLogin' />";
             echo "</select>";
             echo "</form>";
@@ -60,12 +60,12 @@
            
         } else if (isset($_GET['complete'])) { //display complete page 
             include("complete.html"); 
-        } else {                            //display main page
+        } else {                            //display main page 
             include("home.html");
         }
 
         //handle POST requests 
-        if(isset($_POST['submitFile'])) { //handle file upload 
+        if(isset($_POST['submitFile'])) { //handle file upload m
             if ($_FILES['studentGroups']['error'] == UPLOAD_ERR_OK        
                   && is_uploaded_file($_FILES['studentGroups']['tmp_name'])) {
                 $contents = file_get_contents($_FILES['studentGroups']['tmp_name']);
