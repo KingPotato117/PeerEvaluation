@@ -8,7 +8,6 @@
     $dsn = 'mysql:host=localhost;dbname=PeerEval';
     $dbusername = 'prototype';
     $dbpassword = 'CS495';
-    header("Refresh: 0; url=index.php?");
     include("navBar.html");
 
     try {
@@ -79,7 +78,7 @@
                     }
                 }
             createClassroom($db, $groups);
-            header("Refresh: 0; url=index.php?teacherView"); 
+            header("Refresh: 0; url=teacherView"); 
             }
         } else if (isset($_POST['userType'])) { //hander user type form
             $classId = joinClassRoom($db, $_POST['accessCode']);
@@ -88,9 +87,9 @@
                 $_SESSION['classId'] = $classId;
                 $_SESSION['accessCode'] = $_POST['accessCode'];
                 if ($_POST['userType'] == 'Student') {
-                    header("Refresh: 0; url=index.php?student");
+                    header("Refresh: 0; student");
                 } else if ($_POST['userType'] == 'Teacher') {
-                    header("Refresh: 0; url=index.php?teacher");
+                    header("Refresh: 0; url=teacher");
                 } 
             } else {
                 echo "<p>Class with code " . $_POST['accessCode'] . " does not exist! Check code and try again.</p>";
@@ -100,19 +99,19 @@
             $result = checkPassword($db, $_SESSION['accessCode']);
             $pass = $result['classPassword'];
             if ($givenPass == $pass) {
-                header("Refresh: 0; url=index.php?teacherView");
+                header("Refresh: 0; url=teacherView");
             } else {
                 echo "<p>Password given does not match password on record, please try again. </p>";
             }
         } else if (isset($_POST['studentLogin'])) { //handle student login form  
             $_SESSION['studentName'] = $_POST['students'];
-            header("Refresh: 0; url=index.php?studentView");
+            header("Refresh: 0; url=studentView");
         } else if (isset($_POST['eval'])) {  //handle student completing eval 
             storeEval($db, $_POST);
-            header("Refresh: 0; url=index.php?complete"); //not working
+            header("Refresh: 0; url=complete"); //not working
         }
     } catch (PDOException $e) {
-
+        var_dump($e);
     }
 
     include("footer.html");
