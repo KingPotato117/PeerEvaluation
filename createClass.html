@@ -2,8 +2,19 @@
 <body>
     <h2>Create A New Classroom</h2>
     <form method="POST" enctype="multipart/form-data">
-        <label for="studentGroups">Upload student-group file</label>
-        <input type="file" name="studentGroups">
+        <label for="q1">Question 1:</label>
+        <input type="text" name="q1" required>
+        <br />
+        <label for="q1">Question 2:</label>
+        <input type="text" name="q2" required>
+        <br />
+        <label for="q1">Question 3:</label>
+        <input type="text" name="q3" required>
+        <br />
+        <label for="studentGroups">Upload student-group file:</label>
+        <input type="file" name="studentGroups" required>
+        <a href="index.php?help">Help</a>
+        <br />
         <input type="submit" value="Upload File" name="submitFile">
     </form>
 </body>

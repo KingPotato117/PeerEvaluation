@@ -9,16 +9,18 @@
     return implode('', $pieces);
     }
 
-    function createClassRoom($db, $groups) { //still needs error checking
-        try {
+    function createClassRoom($db, $groups, $questions) { //still needs error checking
         $accessCode = random_int(0, 10000);
         $classPass = getRandPass();
     
         //create new classRoom table entry    
-        $createClass = "INSERT INTO `Classrooms` (accessCode, classPassword) VALUES (:accessCode, :classPass)";
+        $createClass = "INSERT INTO `Classrooms` (accessCode, classPassword, Question1, Question2, Question3) VALUES (:accessCode, :classPass, :Question1, :Question2, :Question3)";
         $statement = $db->prepare($createClass);
         $statement->bindValue(':accessCode', $accessCode);
         $statement->bindValue(':classPass', $classPass);
+        $statement->bindvalue(':Question1', $questions[0]);
+        $statement->bindvalue(':Question2', $questions[1]);
+        $statement->bindvalue(':Question3', $questions[2]);
         $success = $statement->execute();
 
         $getClassId = "SELECT classId FROM `Classrooms` WHERE accessCode = :accessCode AND classPassword = :classPass";
@@ -56,7 +58,9 @@
                 $statement->bindvalue(':classId', $cId);
                 $statement->execute();
             }
-        } catch(PDOExecption $e) {}
+
+        $_SESSION['accessCode'] = $accessCode;
+        $_SESSION['classId'] = $cId;
     }
 
     function joinClassRoom($db, $accessCode) {
@@ -160,8 +164,9 @@
         $_SESSION['Students'] = $students;
 
         $studentData = [];
+        $westernIds = [];
         foreach ($studentIds as $id) {
-            $fetchStudentData = "SELECT groupId, Score1, Score2, Score3, AvgScore, Comments FROM `Grades` WHERE studentId = :studentId";
+            $fetchStudentData = "SELECT groupId, Score1, Score2, Score3, AvgScore, Comments, westernId FROM `Grades` WHERE studentId = :studentId";
             $statement = $db->prepare($fetchStudentData);
             $statement->bindvalue(":studentId", $id);
             $statement->execute();
@@ -190,12 +195,16 @@
                     array_push($temp, $grade['Score3']);
                     array_push($temp, $grade['AvgScore']);
                     array_push($temp, $grade['Comments']);
+                    $westernIds[$studentName['studentName']] = $grade['westernId'];
                     array_push($studentData, $temp);
                 }
 
             }
         }
+        $_SESSION['westernIds'] = array_unique($westernIds);
         $_SESSION['studentData'] = $studentData;
+
+        
     }
 
     function getStudentData($db) {
@@ -239,7 +248,7 @@
             $s2 = $data['2eval'.$id];
             $s3 = $data['3eval'.$id];
             $avg = floatval(($s1+$s2+$s3)/3);
-            $insertEval = "INSERT INTO `Grades` (groupId, Score1, Score2, Score3, AvgScore, Comments, studentId) VALUES (:groupId, :Score1, :Score2, :Score3, :AvgScore, :Comments, :studentId)";
+            $insertEval = "INSERT INTO `Grades` (groupId, Score1, Score2, Score3, AvgScore, Comments, studentId, westernId) VALUES (:groupId, :Score1, :Score2, :Score3, :AvgScore, :Comments, :studentId, :westernId)";
             $statement = $db->prepare($insertEval);
             $statement->bindvalue(':groupId', $id);
             $statement->bindvalue(':Score1', $s1);
@@ -248,8 +257,19 @@
             $statement->bindvalue(':AvgScore', $avg);
             $statement->bindvalue(':Comments', $data['comment'.$id]);
             $statement->bindvalue(':studentId', $studentId);
+            $statement->bindvalue(':westernId', $_SESSION['westernId']);
             $statement->execute();
         }
+    }
+
+    function getQuestions($db, $accessCode) {
+        $getQuestion = 'SELECT Question1, Question2, Question3 FROM `Classrooms` WHERE accessCode = :accessCode';
+        $statement = $db->prepare($getQuestion);
+        $statement->bindvalue(':accessCode', $accessCode);
+        $statement->execute();
+        $qs = $statement->fetch();
+
+        return $qs;
     }
 
 ?>
