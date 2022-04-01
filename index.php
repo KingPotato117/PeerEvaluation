@@ -4,9 +4,10 @@
     session_set_cookie_params(4000, '/');          
     session_start();
 
-    $dsn = 'mysql:host=localhost;dbname=PeerEval';
-    $dbusername = 'PeerEvalUser';
-    $dbpassword = 'CS495';
+    $dsn = 'mysql:host=us-cdbr-east-05.cleardb.net/;dbname=heroku_a500c3e55d9d3ba';
+    $dbusername = 'bc63908529504f';
+    $dbpassword = '6cf43e72';
+
 
     include("navBar.html");
 
