@@ -12,6 +12,8 @@
     include("navBar.html");
 
     try {
+        error_reporting(E_ALL);
+        ini_set('display_errors', true);
         $db = new PDO($dsn, $dbusername, $dbpassword);
         //handle GET requests
         if (isset($_GET["createClass"])) {  //display createClassroom page 
