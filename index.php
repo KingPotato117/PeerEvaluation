@@ -46,7 +46,6 @@
         } else if (isset($_GET['studentView'])) { //display student user page 
             getStudentData($db);
             $_SESSION['questions'] = getQuestions($db, $_SESSION['accessCode']);
-            var_dump($_SESSION['questions']);
 
             $id = 0;
             echo "<form method='POST'>";
