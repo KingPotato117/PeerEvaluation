@@ -137,6 +137,7 @@
             header("Refresh: 0; url=index.php?complete"); //not working
         }
     } catch (PDOException $e) {
+        print($e);
     }
 
     include("footer.html");
