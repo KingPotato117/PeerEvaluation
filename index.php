@@ -59,7 +59,7 @@
                 echo "<input name='3eval{$_SESSION['groupIds'][$id]}' type='number' min=1 max=5 required><br>";
                 echo "<label for='comment{$_SESSION['groupIds'][$id]}'>Comments:\t\t</label>";
                 echo "<input name='comment{$_SESSION['groupIds'][$id]}' type='text'><br>";
-                echo "<input name='eval' type='hidden'>";
+                echo "<input name='complete' type='hidden'>";
                 echo "<br>";
                 $id++;
             }
@@ -131,7 +131,7 @@
             $_SESSION['westernId'] = $_POST['westernId'];
             $_SESSION['studentName'] = $_POST['students'];
             header("Refresh: 0; url=index.php?studentView");
-        } else if (isset($_POST['eval'])) {  //handle student completing eval
+        } else if (isset($_POST['complete'])) {  //handle student completing eval
             storeEval($db, $_POST);
             header("Refresh: 0; url=index.php?complete"); //not working
         }
