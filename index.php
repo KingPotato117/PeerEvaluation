@@ -131,7 +131,7 @@
             $_SESSION['westernId'] = $_POST['westernId'];
             $_SESSION['studentName'] = $_POST['students'];
             header("Refresh: 0; url=index.php?studentView");
-        } else if (isset($_POST['eval'])) {  //handle student completing eval 
+        } else if (isset($_POST['eval']action="complete.html")) {  //handle student completing eval 
             storeEval($db, $_POST);
             header("Refresh: 0; url=index.php?complete"); //not working
         }
