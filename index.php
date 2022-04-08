@@ -132,6 +132,7 @@
             $_SESSION['studentName'] = $_POST['students'];
             header("Refresh: 0; url=index.php?studentView");
         } else if (isset($_POST['eval'])) {  //handle student completing eval 
+            flush();
             storeEval($db, $_POST);
             header("Refresh: 0; url=index.php?complete"); //not working
         }
