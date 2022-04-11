@@ -217,7 +217,7 @@
         $statement->execute();
         $res = $statement->fetchall();
         $names = [];
-        foreach ($res as $name) {
+        foreach ($res as $group) {
             if (str_contains($group['names'], $_SESSION['studentName'])) { 
             } else {
                 array_push($names, $group['names']);
