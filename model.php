@@ -9,8 +9,27 @@
     return implode('', $pieces);
     }
 
+    function checkUniqueAccess($db, $code) {
+        $getAccessCodes = "SELECT accessCode FROM `Classrooms`";
+        $statement = $db->prepare($getAccessCodes);
+        $statement->execute();
+        $res = $statement->fetchAll();
+        $codes = [];
+        foreach ($res as $c) {
+            array_push($codes, $c["accessCode"]);
+        }
+        if (in_array($code, $codes)){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     function createClassRoom($db, $groups, $questions) { //still needs error checking
         $accessCode = random_int(0, 10000);
+        while(checkUniqueAccess($db, $accessCode)){
+            $accessCode = random_int(0, 10000);
+        }
         $classPass = getRandPass();
     
         //create new classRoom table entry    
