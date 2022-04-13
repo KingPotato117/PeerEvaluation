@@ -247,8 +247,9 @@
         $studentId = $statement->fetch();
         $studentId = intval($studentId['studentId']);
         foreach ($_SESSION["groupIds"] as $id) {
-            if($s1 === NULL) unset($_SESSION[$s1]);
+            
             $s1 = $data['1eval'.$id];
+            if($s1 === NULL) unset($_SESSION[$s1]);
             $s2 = $data['2eval'.$id];
             $s3 = $data['3eval'.$id];
             $avg = floatval(($s1+$s2+$s3)/3);
