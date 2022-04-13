@@ -266,6 +266,7 @@
         $studentId = $statement->fetch();
         $studentId = intval($studentId['studentId']);
         foreach ($_SESSION["groupIds"] as $id) {
+            if($data['1eval'.$id] === NULL) unset($data['1eval1'.$id]);
             $s1 = $data['1eval'.$id];
             $s2 = $data['2eval'.$id];
             $s3 = $data['3eval'.$id];
