@@ -250,9 +250,6 @@
             $s1 = $data['1eval'.$id];
             $s2 = $data['2eval'.$id];
             $s3 = $data['3eval'.$id];
-            is_null($s1) ? $s1 = 0;
-            is_null($s2) ? $s2 = 0;
-            is_null($s3) ? $s3 = 0;
             $avg = floatval(($s1+$s2+$s3)/3);
             $insertEval = "INSERT INTO `Grades` (groupId, Score1, Score2, Score3, AvgScore, Comments, studentId, westernId) VALUES (:groupId, :Score1, :Score2, :Score3, :AvgScore, :Comments, :studentId, :westernId)";
             $statement = $db->prepare($insertEval);
