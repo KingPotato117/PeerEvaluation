@@ -72,14 +72,25 @@
             $accessCode = $_SESSION['accessCode'];
             $password = checkPassword($db, $accessCode);
             $classInfo = "Access Code: " . $accessCode . " Password: " . $password[0];
-            //print_r($classInfo);
-            error_reporting(E_ALL);
-            ini_set('display_errors', true);
+           
+            $fp = fopen('/tmp/classInfo.txt', 'w') or die("Unable to open file!"); 
+            $size = fwrite($fp, $classInfo);
+            fclose($fp);
 
-            $file = fopen('/classInfo.txt', 'w'); //or die("Unable to open file!"); 
-            var_dump($file);
-            
-            include("teacherView.html");
+            $file = "/tmp/classInfo.txt";
+            if (file_exists($file)) {
+                header('Content-Description: File Transfer');
+                header('Content-Type: application/octet-stream');
+                header('Content-Disposition: attachment; filename='.basename($file));
+                header('Content-Transfer-Encoding: binary');
+                header('Expires: 0');
+                header('Cache-Control: must-revalidate');
+                header('Pragma: public');
+                header('Content-Length: ' . filesize($file));
+                ob_end_clean();
+                readfile("/tmp/classInfo.txt");
+                exit;
+            }
         } else if (isset($_GET['help'])) {
             include("fileHelp.html");
         } else {                            //display main page
