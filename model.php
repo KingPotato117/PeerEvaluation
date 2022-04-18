@@ -1,4 +1,6 @@
 <?php
+    
+
     function getRandPass(): String {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $pieces = [];
@@ -10,7 +12,7 @@
     }
 
     function checkUniqueAccess($db, $code) {
-        $getAccessCodes = "SELECT accessCode FROM `Classrooms`";
+        $getAccessCodes = "SELECT accessCode FROM `classrooms`";
         $statement = $db->prepare($getAccessCodes);
         $statement->execute();
         $res = $statement->fetchAll();
@@ -25,36 +27,38 @@
         }
     }
 
-    function createClassRoom($db, $groups, $questions) { //still needs error checking
+    function createClassRoom($db, $groups, $questions) { //still needs error checking 
         $accessCode = random_int(0, 10000);
+
         while(checkUniqueAccess($db, $accessCode)){
             $accessCode = random_int(0, 10000);
         }
         $classPass = getRandPass();
-    
-        //create new classRoom table entry    
-        $createClass = "INSERT INTO `Classrooms` (accessCode, classPassword, Question1, Question2, Question3) VALUES (:accessCode, :classPass, :Question1, :Question2, :Question3)";
+        $_SESSION['pass'] = $classPass;
+        $hashedPassword = password_hash($classPass, PASSWORD_DEFAULT);
+
+        //create new classRoom table entry  
+        $createClass = "INSERT INTO `classrooms` (accessCode, classPassword, Question1, Question2, Question3) VALUES (:accessCode, :classPass, :Question1, :Question2, :Question3)";
         $statement = $db->prepare($createClass);
         $statement->bindValue(':accessCode', $accessCode);
-        $statement->bindValue(':classPass', $classPass);
+        $statement->bindValue(':classPass', $hashedPassword);
         $statement->bindvalue(':Question1', $questions[0]);
         $statement->bindvalue(':Question2', $questions[1]);
         $statement->bindvalue(':Question3', $questions[2]);
         $success = $statement->execute();
 
-        $getClassId = "SELECT classId FROM `Classrooms` WHERE accessCode = :accessCode AND classPassword = :classPass";
+        $getClassId = "SELECT classId FROM `classrooms` WHERE accessCode = :accessCode";
         $statement = $db->prepare($getClassId);
         $statement->bindValue(':accessCode', $accessCode);
-        $statement->bindValue(':classPass', $classPass);
         $statement->execute();
         $classId = $statement->fetch();
         $cId = $classId['classId'];
 
-        $insertStudent = "INSERT INTO `Students` (studentName, classId) VALUES (:studentName, :classId)";
+        $insertStudent = "INSERT INTO `students` (studentName, classId) VALUES (:studentName, :classId)";
 
         //parse groups 
         foreach ($groups as $group){
-                //go through each name in group, format string properly for group and insert into students table  
+                //go through each name in group, format string properly for group and insert into students table
                 $names = "";
                 foreach ($group as $name) {
                     $name = ltrim($name, "\n ");
@@ -83,7 +87,7 @@
     }
 
     function joinClassRoom($db, $accessCode) {
-        $checkClassId = "SELECT classId FROM `Classrooms` WHERE accessCode = :accessCode";
+        $checkClassId = "SELECT classId FROM `classrooms` WHERE accessCode = :accessCode";
         $statement = $db->prepare($checkClassId);
         $statement->bindValue(':accessCode', $accessCode);
         $statement->execute();
@@ -92,7 +96,7 @@
     }
 
     function getStudents($db) {
-        $getNames = "SELECT studentName FROM `Students` WHERE classId = :classId";
+        $getNames = "SELECT studentName FROM `students` WHERE classId = :classId";
         $statement = $db->prepare($getNames);
         $statement->bindvalue(':classId', $_SESSION['classId']);
         $statement->execute();
@@ -101,7 +105,7 @@
     }
 
     function checkPassword($db, $accessCode) {
-        $checkPass = "SELECT classPassword FROM `Classrooms` WHERE accessCode = :accessCode";
+        $checkPass = "SELECT classPassword FROM `classrooms` WHERE accessCode = :accessCode";
         $statement = $db->prepare($checkPass);
         $statement->bindvalue(':accessCode', $accessCode);
         $statement->execute();
@@ -127,7 +131,7 @@
 
         $data = [];
         foreach($groupIds as $id) {
-            $fetchGroupScoreData = "SELECT Score1, Score2, Score3, AvgScore, Comments FROM `Grades` WHERE groupId = :groupId";
+            $fetchGroupScoreData = "SELECT Score1, Score2, Score3, AvgScore, Comments FROM `grades` WHERE groupId = :groupId";
             $statement = $db->prepare($fetchGroupScoreData);
             $statement->bindvalue(":groupId", $id);
             $statement->execute();
@@ -164,7 +168,7 @@
     }
 
     function fetchAllGradeData($db) {
-        $getStudentIds = "SELECT studentId FROM `Students` WHERE classId = :classId";
+        $getStudentIds = "SELECT studentId FROM `students` WHERE classId = :classId";
         $statement = $db->prepare($getStudentIds);
         $statement->bindvalue(':classId', $_SESSION['classId']);
         $statement->execute();
@@ -185,7 +189,7 @@
         $studentData = [];
         $westernIds = [];
         foreach ($studentIds as $id) {
-            $fetchStudentData = "SELECT groupId, Score1, Score2, Score3, AvgScore, Comments, westernId FROM `Grades` WHERE studentId = :studentId";
+            $fetchStudentData = "SELECT groupId, Score1, Score2, Score3, AvgScore, Comments, westernId FROM `grades` WHERE studentId = :studentId";
             $statement = $db->prepare($fetchStudentData);
             $statement->bindvalue(":studentId", $id);
             $statement->execute();
@@ -201,7 +205,7 @@
                     $statement->execute();
                     $names = $statement->fetch();
 
-                    $getStudentName = "SELECT studentName FROM `Students` WHERE studentId = :studentId";
+                    $getStudentName = "SELECT studentName FROM `students` WHERE studentId = :studentId";
                     $statement = $db->prepare($getStudentName);
                     $statement->bindvalue(':studentId', $id);
                     $statement->execute();
@@ -237,7 +241,8 @@
         $res = $statement->fetchall();
         $names = [];
         foreach ($res as $group) {
-            if (str_contains($group['names'], $_SESSION['studentName'])) { 
+            if (str_contains($group['names'], $_SESSION['studentName'])) {
+                
             } else {
                 array_push($names, $group['names']);
             }
@@ -258,7 +263,7 @@
     }
 
     function storeEval($db, $data) {
-        $fetchStudentId = "SELECT studentId FROM `Students` WHERE (studentName = :studentName AND classId = :classId)";
+        $fetchStudentId = "SELECT studentId FROM `students` WHERE (studentName = :studentName AND classId = :classId)";
         $statement = $db->prepare($fetchStudentId);
         $statement->bindvalue(':studentName', $_SESSION['studentName']);
         $statement->bindvalue(':classId', $_SESSION['classId']);
@@ -266,12 +271,12 @@
         $studentId = $statement->fetch();
         $studentId = intval($studentId['studentId']);
         foreach ($_SESSION["groupIds"] as $id) {
-            if (isset($data['1eval'.$id])) {
+            if ($data['1eval'.$id] != NULL) {
                 $s1 = $data['1eval'.$id];
                 $s2 = $data['2eval'.$id];
                 $s3 = $data['3eval'.$id];
                 $avg = floatval(($s1+$s2+$s3)/3);
-                $insertEval = "INSERT INTO `Grades` (groupId, Score1, Score2, Score3, AvgScore, Comments, studentId, westernId) VALUES (:groupId, :Score1, :Score2, :Score3, :AvgScore, :Comments, :studentId, :westernId)";
+                $insertEval = "INSERT INTO `grades` (groupId, Score1, Score2, Score3, AvgScore, Comments, studentId, westernId) VALUES (:groupId, :Score1, :Score2, :Score3, :AvgScore, :Comments, :studentId, :westernId)";
                 $statement = $db->prepare($insertEval);
                 $statement->bindvalue(':groupId', $id);
                 $statement->bindvalue(':Score1', $s1);
@@ -287,7 +292,7 @@
     }
 
     function getQuestions($db, $accessCode) {
-        $getQuestion = 'SELECT Question1, Question2, Question3 FROM `Classrooms` WHERE accessCode = :accessCode';
+        $getQuestion = 'SELECT Question1, Question2, Question3 FROM `classrooms` WHERE accessCode = :accessCode';
         $statement = $db->prepare($getQuestion);
         $statement->bindvalue(':accessCode', $accessCode);
         $statement->execute();

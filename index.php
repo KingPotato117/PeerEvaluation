@@ -14,6 +14,7 @@
     try {
         error_reporting(E_ALL);
         ini_set('display_errors', true);
+
         $db = new PDO($dsn, $dbusername, $dbpassword);
         //handle GET requests
         if (isset($_GET["createClass"])) {  //display createClassroom page 
@@ -29,7 +30,7 @@
             echo "<br/>";
             echo "<label for='students' >Please select your name: </label>";
             echo "<select name='students' required>";
-            //future: put in html 
+
             foreach ($students as $student) {
                 echo "<option value='". $student["studentName"] . "' >". $student["studentName"] .  "</option>";
             }
@@ -46,7 +47,6 @@
         } else if (isset($_GET['studentView'])) { //display student user page 
             getStudentData($db);
             $_SESSION['questions'] = getQuestions($db, $_SESSION['accessCode']);
-
             $id = 0;
             echo "<form method='POST'>";
             foreach ($_SESSION['names'] as $names) {
@@ -65,14 +65,13 @@
             }
             echo "<input type='submit'>";
             echo "</form>";
-           
         } else if (isset($_GET['complete'])) { //display complete page 
             include("complete.html"); 
         } else if (isset($_GET['download'])) {
             $accessCode = $_SESSION['accessCode'];
-            $password = checkPassword($db, $accessCode);
-            $classInfo = "Access Code: " . $accessCode . " Password: " . $password[0];
-           
+            $password = $_SESSION['pass'];
+            $classInfo = "Access Code: " . $accessCode . " Password: " . $password;
+
             $fp = fopen('/tmp/classInfo.txt', 'w') or die("Unable to open file!"); 
             $size = fwrite($fp, $classInfo);
             fclose($fp);
@@ -93,7 +92,7 @@
             }
         } else if (isset($_GET['help'])) {
             include("fileHelp.html");
-        } else {                            //display main page
+        } else {                            //display main page 
             include("home.html");
         }
 
@@ -132,19 +131,20 @@
         } else if (isset($_POST['teacherLogin'])) { //handle teacher login form
             $givenPass = $_POST['password'];
             $result = checkPassword($db, $_SESSION['accessCode']);
-            $pass = $result['classPassword'];
-            if ($givenPass == $pass) {
+            $hashPass = $result['classPassword'];
+            if (password_verify($givenPass, $hashPass)) {
+                $_SESSION['pass'] = $givenPass;
                 header("Refresh: 0; url=index.php?teacherView");
             } else {
                 echo "<p>Password given does not match password on record, please try again. </p>";
             }
-        } else if (isset($_POST['studentLogin'])) { //handle student login form
+        } else if (isset($_POST['studentLogin'])) { //handle student login form 
             $_SESSION['westernId'] = $_POST['westernId'];
             $_SESSION['studentName'] = $_POST['students'];
             header("Refresh: 0; url=index.php?studentView");
-        } else if (isset($_POST['complete'])) {  //handle student completing eval
+        } else if (isset($_POST['complete'])) {  //handle student completing eval 
             storeEval($db, $_POST);
-            header("Refresh: 0; url=index.php?complete"); //not working
+            header("Refresh: 0; url=index.php?complete");
         }
     } catch (PDOException $e) {
         print($e);
