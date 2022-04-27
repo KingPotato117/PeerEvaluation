@@ -57,20 +57,18 @@
                 unset($_SESSION['groupIds'][$key]);
             }
             foreach ($_SESSION['groupIds'] as $id) {
-                //if (isset($names)) {
-                    echo "<h3>Group: ".$_SESSION['names'][$i] ."</h3><br>";
-                    echo "<label for='1eval$id'>{$_SESSION['questions'][0]}:\t\t</label>";
-                    echo "<input name='1eval$id' type='number' min=1 max=5 required><br>";
-                    echo "<label for='2eval$id'>{$_SESSION['questions'][1]}:\t\t</label>";
-                    echo "<input name='2eval$id' type='number' min=1 max=5 required><br>";
-                    echo "<label for='3eval$id'>{$_SESSION['questions'][2]}:\t\t</label>";
-                    echo "<input name='3eval$id' type='number' min=1 max=5 required><br>";
-                    echo "<label for='comment$id'>Comments:\t\t</label>";
-                    echo "<input name='comment$id' type='text'><br>";
-                    echo "<input name='complete' type='hidden'>";
-                    echo "<br>";
+                echo "<h3>Group: ".$_SESSION['names'][$i] ."</h3><br>";
+                echo "<label for='1eval$id'>{$_SESSION['questions'][0]}:\t\t</label>";
+                echo "<input name='1eval$id' type='number' min=1 max=5 required><br>";
+                echo "<label for='2eval$id'>{$_SESSION['questions'][1]}:\t\t</label>";
+                echo "<input name='2eval$id' type='number' min=1 max=5 required><br>";
+                echo "<label for='3eval$id'>{$_SESSION['questions'][2]}:\t\t</label>";
+                echo "<input name='3eval$id' type='number' min=1 max=5 required><br>";
+                echo "<label for='comment$id'>Comments:\t\t</label>";
+                echo "<input name='comment$id' type='text'><br>";
+                echo "<input name='complete' type='hidden'>";
+                echo "<br>";
                    
-                //}
                 $i++;
             }
             echo "<input type='submit'>";
@@ -161,8 +159,8 @@
         } else if (isset($_POST['complete'])) {  //handle student completing eval
             ob_clean();
             storeEval($db, $_POST);
-            //$_SESSION['loggedIn'] = False;
-            //header("Refresh: 0; url=index.php?complete");
+            $_SESSION['loggedIn'] = False;
+            header("Refresh: 0; url=index.php?complete");
         }
     } catch (PDOException $e) {
         print($e);
