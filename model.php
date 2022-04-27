@@ -270,23 +270,26 @@
         $statement->execute();
         $studentId = $statement->fetch();
         $studentId = intval($studentId['studentId']);
+    
         foreach ($_SESSION["groupIds"] as $id) {
-            if ($data['1eval'.$id] != NULL) {
-                $s1 = $data['1eval'.$id];
-                $s2 = $data['2eval'.$id];
-                $s3 = $data['3eval'.$id];
-                $avg = floatval(($s1+$s2+$s3)/3);
-                $insertEval = "INSERT INTO `grades` (groupId, Score1, Score2, Score3, AvgScore, Comments, studentId, westernId) VALUES (:groupId, :Score1, :Score2, :Score3, :AvgScore, :Comments, :studentId, :westernId)";
-                $statement = $db->prepare($insertEval);
-                $statement->bindvalue(':groupId', $id);
-                $statement->bindvalue(':Score1', $s1);
-                $statement->bindvalue(':Score2', $s2);
-                $statement->bindvalue(':Score3', $s3);
-                $statement->bindvalue(':AvgScore', $avg);
-                $statement->bindvalue(':Comments', $data['comment'.$id]);
-                $statement->bindvalue(':studentId', $studentId);
-                $statement->bindvalue(':westernId', $_SESSION['westernId']);
-                $statement->execute();
+            if ($id != $_SESSION['graderGId']) {
+                if (isset($data['1eval'.$id])) {
+                    $s1 = $data['1eval'.$id];
+                    $s2 = $data['2eval'.$id];
+                    $s3 = $data['3eval'.$id];
+                    $avg = floatval(($s1+$s2+$s3)/3);
+                    $insertEval = "INSERT INTO `grades` (groupId, Score1, Score2, Score3, AvgScore, Comments, studentId, westernId) VALUES (:groupId, :Score1, :Score2, :Score3, :AvgScore, :Comments, :studentId, :westernId)";
+                    $statement = $db->prepare($insertEval);
+                    $statement->bindvalue(':groupId', $id);
+                    $statement->bindvalue(':Score1', $s1);
+                    $statement->bindvalue(':Score2', $s2);
+                    $statement->bindvalue(':Score3', $s3);
+                    $statement->bindvalue(':AvgScore', $avg);
+                    $statement->bindvalue(':Comments', $data['comment'.$id]);
+                    $statement->bindvalue(':studentId', $studentId);
+                    $statement->bindvalue(':westernId', $_SESSION['westernId']);
+                    $statement->execute();
+                }
             }
         }
     }
@@ -299,6 +302,16 @@
         $qs = $statement->fetch();
 
         return $qs;
+    }
+
+    function getUserGroup($db) {
+        $fetchStudentGroupId = "SELECT groupId FROM `groups` WHERE names LIKE CONCAT('%', :studentName, '%')";
+        $statement = $db->prepare($fetchStudentGroupId);
+        $statement->bindvalue(':studentName', $_SESSION['studentName']);
+        $statement->execute();
+        $res = $statement->fetch();
+        $graderGId = $res['groupId'];
+        return $graderGId;
     }
 
 ?>
