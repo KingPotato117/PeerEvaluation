@@ -1,6 +1,6 @@
 <html>
 <body>
-    <h2>Access Code: <?= $_SESSION['accessCode']?> <a href="index.php?download">Download Password</a></h2>
+    <h2 id="accessCode">Access Code: <?= $_SESSION['accessCode']?> <a href="index.php?download" id="pass">Download Password</a></h2>
     <h1>Group Averages</h1>
     <table>
         <tr>
@@ -16,10 +16,10 @@
         foreach ($_SESSION['data'] as $groupData): ?>
         <tr>
             <td><?= $_SESSION['groupNames'][$i] ?></td>
-            <td><?php if($groupData != false) { echo $groupData[0]; } else { echo "NA"; } ?></td>
-            <td><?php if($groupData != false) { echo $groupData[1]; } else { echo "NA"; } ?></td>
-            <td><?php if($groupData != false) { echo $groupData[2]; } else { echo "NA"; } ?></td>
-            <td><?php if($groupData != false) { echo $groupData[3]; } else { echo "NA"; } ?></td>
+            <td><?php if($groupData != false) { echo round($groupData[0], 2); } else { echo "NA"; } ?></td>
+            <td><?php if($groupData != false) { echo round($groupData[1], 2); } else { echo "NA"; } ?></td>
+            <td><?php if($groupData != false) { echo round($groupData[2], 2); } else { echo "NA"; } ?></td>
+            <td><?php if($groupData != false) { echo round($groupData[3], 2); } else { echo "NA"; } ?></td>
             <td><?php if($groupData != false) { echo $groupData[4]; } else { echo "NA"; } ?></td>
         </tr>
 
@@ -31,13 +31,14 @@
     </table>
 
     <br />
+    <hr>
     <br />
     <h1>Individual Student Grade Info</h1>
     <?php
     $i = 0;
     foreach ($_SESSION['Students'] as $student): ?>
-    <h3><?= $student ?></h3>
-    <h3>
+    <h3 id="names"><?= $student ?></h3>
+    <h3 id="westernId">
         <?php if (array_key_exists($student, $_SESSION['westernIds'])):
         echo 'Western Id: ' . $_SESSION['westernIds'][$student];
         else:
@@ -46,6 +47,7 @@
         ?>
     </h3>
     <table>
+        <?php if (array_key_exists($student, $_SESSION['westernIds'])): ?>
         <tr>
             <th>Group</th>
             <th>Score1</th>
@@ -54,6 +56,7 @@
             <th>Average</th>
             <th>Comment</th>
         </tr>
+        <?php endif; ?>
         <?php foreach ($_SESSION['studentData'] as $data):
         if ($data != false && $data[0] == $student): ?>
         <tr>
@@ -68,8 +71,8 @@
         <?php endif; ?>
         <?php endforeach; ?>
     </table>
+    <hr>
     <?php
-
     endforeach; ?>
 </body>
 </html>

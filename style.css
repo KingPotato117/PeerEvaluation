@@ -1,8 +1,90 @@
 body{
-  background-color: linen;
+  background-color:gray;
   text-align: center;
 }
 h1{
  color: maroon;
  text-align:center;
+ font-size: 40px;
+}
+p {
+    color:maroon;
+}
+a {
+    color: maroon;
+    padding: 25px;
+    margin: 25px;
+    font-size: 25px;
+}
+#Header {
+    border-style: none none solid none;
+    padding-bottom: 25px;
+}
+h2 {
+    color:white;
+    font-size: 30px;
+}
+h3 {
+    color: white;
+}
+input {
+    padding: 10px;
+}
+label {
+    color: white;
+    font-size: 25px;
+}
+footer {
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+}
+.choices {
+    color:gold;
+}
+#help {
+    color:gold;
+}
+table {
+    width: 100%;
+    text-align: left;
+}
+th {
+    color: maroon;
+    font-size: 20px;
+    border: solid;
+    border-color: black;
+}
+td {
+    color: white;
+    font-size: 20px;
+    border: solid;
+    border-color: black;
+}
+#westernId {
+    color: maroon;
+    font-size: 20px;
+}
+#names {
+    font-size: 35px;
+}
+#accessCode {
+    color:gold;
+    font-weight: bold;
+}
+#pass {
+    color:deepskyblue;
+    font-weight: bolder;
+    font-size: 30px;
+}
+#passNote {
+    color:maroon;
+    font-size: 25px;
+}
+.redHead {
+    color:maroon;
+    font-size: 35px;
+}
+#comment {
+    padding: 15px 20px;
 }

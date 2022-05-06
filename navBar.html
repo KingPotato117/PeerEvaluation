@@ -7,10 +7,14 @@
 </head>
 <html>
 <body>
-    <header>
+    <header id='Header'>
         <a href="index.php">Home</a>
         <a href="index.php?createClass">Create Class</a>
         <a href="index.php?joinClass">Join Class</a>
+        <?php if ($_SESSION['loggedIn'] == True) {
+            echo "<a href='index.php?logOut'>Log Out</a>";
+        } 
+        ?>
     </header>
 </body>
 </html>

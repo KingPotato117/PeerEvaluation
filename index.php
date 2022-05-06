@@ -1,14 +1,13 @@
 <?php
     require("model.php");
          
-    session_set_cookie_params(4000, '/');          
+    session_set_cookie_params(5000, '/');          
     session_start();
 
-    $dsn = 'mysql:host=us-cdbr-east-05.cleardb.net;dbname=heroku_a500c3e55d9d3ba';
-    $dbusername = 'bc63908529504f';
-    $dbpassword = '6cf43e72';
+    $dsn = 'mysql:host=sql302.epizy.com;dbname=epiz_31624666_PeerEval';
+    $dbusername = 'epiz_31624666';
+    $dbpassword = 'pSoQUiGeofI';
 
-    var_dump($_SESSION['loggedIn']);
     include("navBar.html");
 
     try {
@@ -26,16 +25,14 @@
             $students = getStudents($db);
             echo "<form method='POST'>";
             echo "<label for='westernId'>Western Student Id: </label>";
-            echo "<input type='number' name='westernId'/>";
+            echo "<input type='number' name='westernId' min=111111 max=999999 required/>";
             echo "<br/>";
             echo "<label for='students' >Please select your name: </label>";
             echo "<select name='students' required>";
-
             foreach ($students as $student) {
                 echo "<option value='". $student["studentName"] . "' >". $student["studentName"] .  "</option>";
             }
-            echo "<br/>";
-            echo "<input type='submit' name='studentLogin' />";
+            echo "<input type='submit' name='studentLogin' value='Login'/>";
             echo "</select>";
             echo "</form>";
         } else if (isset($_GET['teacher'])) { //display teacher login page 
@@ -55,20 +52,23 @@
             echo "<form method='POST'>";
             if (($key = array_search($_SESSION['graderGId'], $_SESSION['groupIds'])) !== false) {
                 unset($_SESSION['groupIds'][$key]);
+                unset($_SESSION['names'][$key]);
             }
-            foreach ($_SESSION['groupIds'] as $id) {
-                echo "<h3>Group: ".$_SESSION['names'][$i] ."</h3><br>";
-                echo "<label for='1eval$id'>{$_SESSION['questions'][0]}:\t\t</label>";
-                echo "<input name='1eval$id' type='number' min=1 max=5 required><br>";
-                echo "<label for='2eval$id'>{$_SESSION['questions'][1]}:\t\t</label>";
-                echo "<input name='2eval$id' type='number' min=1 max=5 required><br>";
-                echo "<label for='3eval$id'>{$_SESSION['questions'][2]}:\t\t</label>";
-                echo "<input name='3eval$id' type='number' min=1 max=5 required><br>";
-                echo "<label for='comment$id'>Comments:\t\t</label>";
-                echo "<input name='comment$id' type='text'><br>";
+
+            foreach ($_SESSION['names'] as $name) {
+                $key = array_search($name, $_SESSION['names']);
+                echo "<h3 class='redHead'>Group: ".$name."</h3><br>";
+                echo "<label for='1eval{$_SESSION['groupIds'][$key]}'>{$_SESSION['questions'][0]}:\t\t</label>";
+                echo "<input name='1eval{$_SESSION['groupIds'][$key]}' type='number' min=1 max=5 required><br>";
+                echo "<label for='2eval{$_SESSION['groupIds'][$key]}'>{$_SESSION['questions'][1]}:\t\t</label>";
+                echo "<input name='2eval{$_SESSION['groupIds'][$key]}' type='number' min=1 max=5 required><br>";
+                echo "<label for='3eval{$_SESSION['groupIds'][$key]}'>{$_SESSION['questions'][2]}:\t\t</label>";
+                echo "<input name='3eval{$_SESSION['groupIds'][$key]}' type='number' min=1 max=5 required><br>";
+                echo "<label for='comment{$_SESSION['groupIds'][$key]}'>Comments for group:\t\t</label>";
+                echo "<input name='comment{$_SESSION['groupIds'][$key]}' type='text' id='comment'><br>";
                 echo "<input name='complete' type='hidden'>";
-                echo "<br>";
-                   
+                echo "<br>";    
+
                 $i++;
             }
             echo "<input type='submit'>";
@@ -102,7 +102,7 @@
             include("fileHelp.html");
         } else if (isset($_GET['logOut'])) {
             $_SESSION['loggedIn'] = False;
-            include("home.html");
+            header("Refresh: 0; url=index.php");
         } else {                            //display main page  
             include("home.html");   
         }
@@ -153,9 +153,15 @@
             }
         } else if (isset($_POST['studentLogin'])) { //handle student login form 
             $_SESSION['westernId'] = $_POST['westernId'];
-            $_SESSION['studentName'] = $_POST['students'];
-            $_SESSION['loggedIn'] = True;
-            header("Refresh: 0; url=index.php?studentView");
+            $studentName = $_POST['students'];
+            $hasGraded = checkForGrade($db, $studentName);
+            if ($hasGraded) {
+                echo "<h3>You have already graded!</h3>";
+            } else {
+                $_SESSION['studentName'] = $studentName;
+                $_SESSION['loggedIn'] = True;
+                header("Refresh: 0; url=index.php?studentView");
+            }
         } else if (isset($_POST['complete'])) {  //handle student completing eval
             ob_clean();
             storeEval($db, $_POST);

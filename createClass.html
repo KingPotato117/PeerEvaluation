@@ -1,6 +1,6 @@
 <html>
 <body>
-    <h2>Create A New Classroom</h2>
+    <h2 class="redHead">Create A New Classroom</h2>
     <form method="POST" enctype="multipart/form-data">
         <label for="q1">Question 1:</label>
         <input type="text" name="q1" required>
@@ -13,9 +13,10 @@
         <br />
         <label for="studentGroups">Upload student-group file:</label>
         <input type="file" name="studentGroups" required>
-        <a href="index.php?help">Help</a>
+        <a href="index.php?help" id="help">Help</a>
         <br />
         <input type="submit" value="Upload File" name="submitFile">
     </form>
+    <h3 id="passNote">Be sure to download the password after creating the classroom! You NEED this to log back in.</h3>
 </body>
 </html>
