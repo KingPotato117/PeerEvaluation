@@ -4,9 +4,9 @@
     session_set_cookie_params(5000, '/');          
     session_start();
 
-    $dsn = 'mysql:host=sql302.epizy.com;dbname=epiz_31624666_PeerEval';
-    $dbusername = 'epiz_31624666';
-    $dbpassword = 'pSoQUiGeofI';
+    $dsn = '***';
+    $dbusername = '***';
+    $dbpassword = '***';
 
     include("navBar.html");
 
